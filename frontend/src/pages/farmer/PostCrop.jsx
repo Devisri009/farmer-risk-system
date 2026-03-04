@@ -19,7 +19,7 @@ const PostCrop = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await apiClient.post('/api/batches', formData);
+            await apiClient.post('/batches', formData);
             alert("Crop batch created successfully!");
             setFormData({ cropName: '', quantity: '', basePrice: '', harvestDate: '', location: '' });
             navigate('/farmer/batches');

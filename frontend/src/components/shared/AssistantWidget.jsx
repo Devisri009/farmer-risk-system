@@ -31,7 +31,7 @@ const AssistantWidget = () => {
         setLoading(true);
 
         try {
-            const response = await apiClient.post('/api/assistant', { message: userMsg });
+            const response = await apiClient.post('/assistant', { message: userMsg });
             setMessages((prev) => [...prev, { role: 'assistant', text: response.data.reply || response.data }]);
         } catch (error) {
             console.error("AI Assistant request failed:", error);
@@ -80,8 +80,8 @@ const AssistantWidget = () => {
                                     </div>
                                 )}
                                 <div className={`px-4 py-2.5 rounded-2xl max-w-[80%] text-sm leading-relaxed ${msg.role === 'user'
-                                        ? 'bg-primary-green text-white rounded-tr-sm'
-                                        : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm shadow-sm'
+                                    ? 'bg-primary-green text-white rounded-tr-sm'
+                                    : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm shadow-sm'
                                     }`}>
                                     {msg.text}
                                 </div>

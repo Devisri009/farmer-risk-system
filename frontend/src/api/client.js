@@ -1,22 +1,18 @@
 import axios from 'axios';
 
-// Create an Axios instance configured with the backend API baseURL
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Optional: Add request interceptors to inject auth tokens
+// Automatically attach token to every request
 apiClient.interceptors.request.use(
     (config) => {
-        const userStr = localStorage.getItem('farmvista_user');
-        if (userStr) {
-            const user = JSON.parse(userStr);
-            if (user.token) {
-                config.headers.Authorization = `Bearer ${user.token}`;
-            }
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },

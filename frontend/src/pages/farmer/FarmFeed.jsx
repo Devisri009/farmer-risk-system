@@ -10,7 +10,7 @@ const FarmFeed = () => {
 
     const fetchPosts = async () => {
         try {
-            const response = await apiClient.get('/api/posts');
+            const response = await apiClient.get('/posts');
             // If API fails or is empty, we will have a default state below, 
             // but let's assume it returns { data: [...] }
             setPosts(response.data);
@@ -51,7 +51,7 @@ const FarmFeed = () => {
         if (!newPost.trim()) return;
         setIsSubmitting(true);
         try {
-            const response = await apiClient.post('/api/posts', {
+            const response = await apiClient.post('/posts', {
                 content: newPost,
                 // Mocking user details for now
                 farmerName: 'Current User',

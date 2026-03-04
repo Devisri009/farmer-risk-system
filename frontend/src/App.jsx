@@ -1,31 +1,28 @@
 // App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import AuthLayout from './layouts/AuthLayout';
-import MainLayout from './layouts/MainLayout';
+import ProtectedRoute from './routes/ProtectedRoute';
+import DashboardLayout from './layout/DashboardLayout';
 
 // Public Pages
 import Landing from './pages/public/Landing';
 import Login from './pages/public/Login';
 import Register from './pages/public/Register';
-
-// Farmer Pages
-import FarmerHome from './pages/farmer/Home';
-import PostCrop from './pages/farmer/PostCrop';
-import MyBatches from './pages/farmer/MyBatches';
-import BatchDetails from './pages/farmer/BatchDetails';
-import FarmFeed from './pages/farmer/FarmFeed';
-
-// Retailer Pages
-import RetailerMarketplace from './pages/retailer/Marketplace';
-import RetailerPurchases from './pages/retailer/Purchases';
-import PaymentBreakdown from './pages/retailer/PaymentBreakdown';
-
-// Placeholder Pages
 import QRTracking from './pages/public/QRTracking';
 
-// Placeholder Pages
-const Settings = () => <div className="p-8 text-2xl text-center">Settings</div>;
+// Farmer Pages
+import DashboardHome from './pages/DashboardHome';
+import PostCrop from './pages/PostCrop';
+import MyBatches from './pages/MyBatches';
+import BatchDetails from './pages/BatchDetails';
+import FarmFeed from './pages/FarmFeed';
+
+// Placeholder Pages for Settings/Alerts/Assistant if needed
+const Placeholder = ({ title }) => (
+  <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-100 min-h-[400px] flex items-center justify-center">
+    <h2 className="text-2xl font-bold text-gray-400">{title} Component Coming Soon</h2>
+  </div>
+);
 
 function App() {
   return (
@@ -33,33 +30,26 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/track/:id" element={<QRTracking />} />
 
-        {/* Farmer Routes */}
-        <Route path="/farmer/*" element={<MainLayout>
-          <Routes>
-            <Route path="dashboard" element={<FarmerHome />} />
-            <Route path="post-crop" element={<PostCrop />} />
-            <Route path="batches" element={<MyBatches />} />
-            <Route path="batches/:id" element={<BatchDetails />} />
-            <Route path="feed" element={<FarmFeed />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </MainLayout>} />
-
-        {/* Retailer Routes */}
-        <Route path="/retailer/*" element={<MainLayout>
-          <Routes>
-            <Route path="marketplace" element={<RetailerMarketplace />} />
-            <Route path="purchases" element={<RetailerPurchases />} />
-            <Route path="payment/:id" element={<PaymentBreakdown />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="marketplace" replace />} />
-          </Routes>
-        </MainLayout>} />
+        {/* Farmer Dashboard Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/farmer/*" element={<DashboardLayout>
+            <Routes>
+              <Route path="dashboard" element={<DashboardHome />} />
+              <Route path="post-crop" element={<PostCrop />} />
+              <Route path="batches" element={<MyBatches />} />
+              <Route path="batches/:id" element={<BatchDetails />} />
+              <Route path="feed" element={<FarmFeed />} />
+              <Route path="alerts" element={<Placeholder title="Climate Alerts" />} />
+              <Route path="assistant" element={<Placeholder title="AI Assistant" />} />
+              <Route path="settings" element={<Placeholder title="Settings" />} />
+              <Route path="*" element={<Navigate to="dashboard" replace />} />
+            </Routes>
+          </DashboardLayout>} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

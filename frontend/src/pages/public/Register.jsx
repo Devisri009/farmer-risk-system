@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import apiClient from '../../api/client';
-import farmPhoto from '../../assets/farm-photo.jpg';
-
+import registerIllustration from '../../assets/register-illustration.png';
+import LanguageToggle from '../../components/layout/LanguageToggle';
 /* ── Reusable input renderer defined OUTSIDE to prevent focus loss ── */
 const InputField = ({ label, name, type = 'text', placeholder, value, onChange, error, required = true }) => (
     <div>
@@ -35,6 +36,7 @@ const InputField = ({ label, name, type = 'text', placeholder, value, onChange, 
 
 const Register = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [role, setRole] = useState('farmer');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState('');
@@ -115,17 +117,33 @@ const Register = () => {
                 location: formData.location.trim(),
             };
 
-            await apiClient.post('/api/auth/register', payload);
+            await apiClient.post('/auth/register', payload);
 
             setSuccessMsg('Account created successfully! Redirecting to login...');
             setTimeout(() => {
                 navigate('/login');
             }, 1500);
         } catch (err) {
-            const message =
-                err.response?.data?.message ||
-                err.response?.data?.error ||
-                'Registration failed. Please try again.';
+            console.error('Registration Error:', err);
+
+            let message = 'Registration failed. Please try again.';
+
+            if (err.response?.data?.detail) {
+                const detail = err.response.data.detail;
+                if (typeof detail === 'string') {
+                    message = detail;
+                } else if (Array.isArray(detail)) {
+                    // Handle validation errors from FastAPI (array of objects)
+                    message = detail.map(d => d.msg).join(', ');
+                }
+            } else if (err.response?.data?.message) {
+                message = err.response.data.message;
+            } else if (err.response?.data?.error) {
+                message = err.response.data.error;
+            } else if (err.message) {
+                message = err.message;
+            }
+
             setApiError(message);
         } finally {
             setIsSubmitting(false);
@@ -133,7 +151,10 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row">
+        <div className="min-h-screen flex flex-col lg:flex-row relative">
+            <div className="absolute top-4 right-6 z-10">
+                <LanguageToggle />
+            </div>
             {/* ════════════ LEFT — Platform Introduction ════════════ */}
             <div className="lg:w-[48%] w-full flex flex-col justify-center items-center px-8 py-12 lg:py-0"
                 style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #dcfce7 50%, #f0fdf4 100%)' }}>
@@ -146,13 +167,12 @@ const Register = () => {
 
                     {/* Heading */}
                     <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
-                        Smart Digital<br />Agriculture Platform
+                        {t('hero.title1')} <br /> {t('hero.title2')}
                     </h1>
 
                     {/* Description */}
                     <p className="text-gray-600 text-sm lg:text-base leading-relaxed">
-                        FarmVista helps farmers and retailers connect through a climate-aware agricultural marketplace.
-                        Monitor climate risks, track crop batches, and trade crops with full transparency.
+                        {t('hero.description')}
                     </p>
 
                     {/* Feature pills */}
@@ -167,7 +187,7 @@ const Register = () => {
                     {/* Illustration */}
                     <div className="pt-4">
                         <img
-                            src={farmPhoto}
+                            src={registerIllustration}
                             alt="Sustainable agriculture — farmers working in a field"
                             className="w-full max-w-lg mx-auto rounded-3xl shadow-xl hover:scale-[1.02] transition-transform duration-500 object-cover"
                         />
@@ -180,10 +200,10 @@ const Register = () => {
                 <div className="w-full max-w-md">
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 lg:p-10">
                         {/* Form header */}
-                        <div className="mb-7">
-                            <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
-                            <p className="text-gray-500 text-sm mt-1">Register to start using FarmVista.</p>
-                            <p className="text-gray-400 text-xs mt-2">Fields marked with <span className="text-red-500">*</span> are required.</p>
+                        <div className="mb-7 mt-4">
+                            <h2 className="text-2xl font-bold text-gray-900">{t('register.title')}</h2>
+                            <p className="text-gray-500 text-sm mt-1">{t('register.subtitle')}</p>
+                            <p className="text-gray-400 text-xs mt-2">{t('register.required')}</p>
                         </div>
 
                         {/* API-level messages */}
@@ -207,11 +227,11 @@ const Register = () => {
                         <form onSubmit={handleSubmit} noValidate className="space-y-4">
                             {/* ── Role selector ── */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Select Role <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('register.role')} <span className="text-red-500">*</span></label>
                                 <div className="grid grid-cols-2 gap-3">
                                     {[
-                                        { value: 'farmer', label: 'Farmer', icon: '🌾' },
-                                        { value: 'retailer', label: 'Retailer', icon: '🛒' },
+                                        { value: 'farmer', label: t('register.roleFarmer'), icon: '🌾' },
+                                        { value: 'retailer', label: t('register.roleRetailer'), icon: '🛒' },
                                     ].map((r) => (
                                         <button
                                             key={r.value}
@@ -232,7 +252,7 @@ const Register = () => {
 
                             {/* ── Input fields ── */}
                             <InputField
-                                label="Full Name"
+                                label={t('register.name')}
                                 name="name"
                                 placeholder="e.g. Logesh Kumar"
                                 value={formData.name}
@@ -240,7 +260,7 @@ const Register = () => {
                                 error={errors.name}
                             />
                             <InputField
-                                label="Email Address"
+                                label={t('register.email')}
                                 name="email"
                                 type="email"
                                 placeholder="logesh@example.com"
@@ -249,7 +269,7 @@ const Register = () => {
                                 error={errors.email}
                             />
                             <InputField
-                                label="Phone Number"
+                                label={t('register.phone')}
                                 name="phone"
                                 type="tel"
                                 placeholder="9876543210"
@@ -258,7 +278,7 @@ const Register = () => {
                                 error={errors.phone}
                             />
                             <InputField
-                                label="Password"
+                                label={t('register.password')}
                                 name="password"
                                 type="password"
                                 placeholder="Min. 6 characters"
@@ -267,7 +287,7 @@ const Register = () => {
                                 error={errors.password}
                             />
                             <InputField
-                                label="Confirm Password"
+                                label={t('register.confirmPassword')}
                                 name="confirmPassword"
                                 type="password"
                                 placeholder="Re-enter password"
@@ -276,7 +296,7 @@ const Register = () => {
                                 error={errors.confirmPassword}
                             />
                             <InputField
-                                label="Location"
+                                label={t('register.location')}
                                 name="location"
                                 placeholder="e.g. Tamil Nadu"
                                 value={formData.location}
@@ -300,19 +320,19 @@ const Register = () => {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                         </svg>
-                                        Creating Account...
+                                        {t('register.creatingAccount')}
                                     </span>
                                 ) : (
-                                    'Create Account'
+                                    t('register.createAccount')
                                 )}
                             </button>
                         </form>
 
                         {/* ── Login redirect ── */}
                         <p className="text-center text-sm text-gray-500 mt-6">
-                            Already have an account?{' '}
+                            {t('register.hasAccount')}{' '}
                             <Link to="/login" className="text-green-600 font-semibold hover:text-green-700 hover:underline transition-colors">
-                                Login
+                                {t('register.loginLink')}
                             </Link>
                         </p>
                     </div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageToggle from '../../components/layout/LanguageToggle';
 import {
     CloudRain, ShieldCheck, Bot, TrendingUp, Languages, Users,
     PlusSquare, BarChart3, ShoppingCart, Link2,
@@ -78,12 +80,14 @@ const Reveal = ({ children, className = '', delay = 0 }) => {
 const Navbar = () => {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const { t } = useTranslation();
+
     const navLinks = [
-        { label: 'Home', id: 'home' },
-        { label: 'Features', id: 'features' },
-        { label: 'How It Works', id: 'howitworks' },
+        { label: t('nav.home'), id: 'home' },
+        { label: t('nav.features'), id: 'features' },
+        { label: t('nav.howItWorks'), id: 'howitworks' },
         { label: 'Reviews', id: 'reviews' },
-        { label: 'FAQ', id: 'faq' },
+        { label: t('nav.faq'), id: 'faq' },
     ];
 
     useEffect(() => {
@@ -96,18 +100,18 @@ const Navbar = () => {
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 h-16">
                 {/* Logo */}
-                <button className="flex items-center gap-2 group" onClick={() => scrollTo('home')}>
+                <button className="flex items-center gap-2 group shrink-0" onClick={() => scrollTo('home')}>
                     <Sprout className="text-[#2E7D32] transition-transform duration-300 group-hover:rotate-12" size={28} />
-                    <span className="text-xl font-extrabold text-[#2E7D32]">FarmVista</span>
+                    <span className="text-xl font-extrabold text-[#2E7D32] hidden sm:block">FarmVista</span>
                 </button>
 
                 {/* Desktop nav */}
-                <div className="hidden md:flex items-center gap-1">
+                <div className="hidden md:flex items-center gap-1 mx-4">
                     {navLinks.map(l => (
                         <button
                             key={l.id}
                             onClick={() => scrollTo(l.id)}
-                            className="relative px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#2E7D32] transition-colors duration-200 group"
+                            className="relative px-3 py-2 text-sm font-medium text-gray-600 hover:text-[#2E7D32] transition-colors duration-200 group whitespace-nowrap"
                         >
                             {l.label}
                             <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#2E7D32] rounded-full transition-all duration-300 group-hover:w-3/4" />
@@ -115,25 +119,29 @@ const Navbar = () => {
                     ))}
                 </div>
 
-                {/* Auth buttons */}
-                <div className="hidden md:flex items-center gap-3">
+                {/* Right Actions */}
+                <div className="hidden md:flex items-center gap-3 shrink-0">
+                    <LanguageToggle />
                     <Link to="/login"
                         className="px-5 py-2 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold text-sm hover:bg-[#2E7D32] hover:text-white transition-all duration-300">
-                        Login
+                        {t('nav.login')}
                     </Link>
                     <Link to="/register"
                         className="px-5 py-2 rounded-full bg-[#2E7D32] text-white font-bold text-sm hover:bg-green-800 hover:shadow-lg hover:shadow-green-200 transition-all duration-300">
-                        Register
+                        {t('nav.register')}
                     </Link>
                 </div>
 
                 {/* Mobile toggle */}
-                <button className="md:hidden p-2 text-gray-600 hover:text-[#2E7D32] transition-colors" onClick={() => setOpen(!open)}>
-                    <div className="relative w-6 h-6">
-                        <Menu size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'}`} />
-                        <X size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}`} />
-                    </div>
-                </button>
+                <div className="md:hidden flex items-center gap-3">
+                    <LanguageToggle />
+                    <button className="p-2 text-gray-600 hover:text-[#2E7D32] transition-colors" onClick={() => setOpen(!open)}>
+                        <div className="relative w-6 h-6">
+                            <Menu size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'}`} />
+                            <X size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}`} />
+                        </div>
+                    </button>
+                </div>
             </div>
 
             {/* Mobile menu */}
@@ -146,8 +154,8 @@ const Navbar = () => {
                         </button>
                     ))}
                     <div className="flex gap-3 mt-4">
-                        <Link to="/login" className="flex-1 text-center px-4 py-2.5 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold text-sm hover:bg-[#2E7D32] hover:text-white transition-all duration-300">Login</Link>
-                        <Link to="/register" className="flex-1 text-center px-4 py-2.5 rounded-full bg-[#2E7D32] text-white font-bold text-sm hover:bg-green-800 transition-colors">Register</Link>
+                        <Link to="/login" className="flex-1 text-center px-4 py-2.5 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold text-sm hover:bg-[#2E7D32] hover:text-white transition-all duration-300">{t('nav.login')}</Link>
+                        <Link to="/register" className="flex-1 text-center px-4 py-2.5 rounded-full bg-[#2E7D32] text-white font-bold text-sm hover:bg-green-800 transition-colors">{t('nav.register')}</Link>
                     </div>
                 </div>
             </div>
@@ -265,6 +273,8 @@ const FAQItem = ({ q, a, delay }) => {
 
 /* ══════════════════ LANDING PAGE ══════════════════ */
 const Landing = () => {
+    const { t } = useTranslation();
+
     return (
         <div className="bg-white text-gray-800 overflow-x-hidden scroll-smooth">
             <Navbar />
@@ -278,22 +288,22 @@ const Landing = () => {
                 <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col-reverse md:flex-row items-center gap-12 relative z-10">
                     <Reveal className="md:w-1/2 space-y-6">
                         <span className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-[#2E7D32] text-xs font-bold tracking-wide uppercase animate-pulse">
-                            🌱 Climate-Aware Agriculture
+                            🌱 {t('hero.badge')}
                         </span>
                         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900">
-                            Farm<span className="text-[#2E7D32]">Vista</span> – Climate-Aware Agricultural Supply Chain Platform
+                            Farm<span className="text-[#2E7D32]">Vista</span> – {t('hero.title1')} <br className="hidden md:block" /> {t('hero.title2')}
                         </h1>
                         <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
-                            Connecting farmers and retailers through a transparent digital marketplace while helping farmers manage climate risks.
+                            {t('hero.description')}
                         </p>
                         <div className="flex flex-wrap gap-4 pt-2">
                             <Link to="/register"
                                 className="group px-7 py-3.5 rounded-full bg-[#2E7D32] text-white font-bold hover:bg-green-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-200 flex items-center gap-2">
-                                Get Started <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+                                {t('hero.getStarted')} <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
                             </Link>
                             <Link to="/retailer/marketplace"
                                 className="px-7 py-3.5 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold hover:bg-[#2E7D32] hover:text-white transition-all duration-300">
-                                Explore Marketplace
+                                {t('hero.viewMarket')}
                             </Link>
                         </div>
                     </Reveal>
