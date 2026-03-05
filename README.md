@@ -1,216 +1,158 @@
-FarmVista – Climate-Aware Agricultural Supply Chain Platform
+# 🌾 Farmer Predictive Intelligence & Risk Shield System
 
-FarmVista is a climate-aware, blockchain-enabled agricultural supply chain platform designed to empower farmers with transparency, climate insights, and intelligent decision support.
-The platform enables farmers to track crops, receive climate alerts, and make better selling decisions while ensuring transparent crop transactions between farmers and retailers.
+AI-powered decision support platform designed to help farmers reduce financial loss by predicting crop prices, analyzing risks, and providing actionable recommendations.
 
-🚜 Problem Statement
+---
 
-Farmers today face several major challenges in agricultural supply chains:
+## 📌 Problem
 
-Lack of Supply Chain Transparency
+Farmers face several major challenges:
 
-Farmers do not know how crop prices increase from farm to market.
-Multiple intermediaries increase prices, reducing farmer income.
+• Sudden market price crashes after harvest  
+• Climate unpredictability affecting crop yield  
+• Confusion about whether to store or sell crops  
+• Lack of data-driven decision support tools  
 
-Climate Uncertainty
+As a result, farmers often make selling decisions blindly, leading to financial loss and debt cycles.
 
-Sudden rainfall, extreme heat, and humidity can damage crops after harvest.
+---
 
-Poor Selling Decisions
+## 🚀 Solution
 
-Farmers often sell crops at lower prices due to lack of market intelligence.
+The **Farmer Predictive Intelligence & Risk Shield System** provides an intelligent dashboard that helps farmers make better decisions.
 
-Language & Digital Barriers
+The system:
 
-Many farmers are not comfortable using English-based digital platforms.
+✔ Predicts crop price trends  
+✔ Analyzes market volatility  
+✔ Calculates a unified **Farmer Risk Index (FRI)**  
+✔ Provides clear recommendations like **Sell Now** or **Hold**
 
-Lack of Verifiable Tracking
+Instead of only showing data, the system provides **actionable insights**.
 
-Traditional agricultural markets lack a secure system to track crop ownership and price history.
+---
 
-These problems result in:
+## 🧠 Key Innovations
 
-Reduced farmer income
+### Farmer Risk Index (FRI)
 
-Post-harvest losses
+A unified risk score combining:
 
-Market distrust
+• Market volatility  
+• Climate risk  
+• Storage risk  
 
-Financial instability
+This produces a clear risk level:
 
-🌱 Proposed Solution
+🟢 Low Risk  
+🟡 Medium Risk  
+🔴 High Risk
 
-FarmVista introduces a Climate-Aware Blockchain Agricultural Platform that integrates:
+---
 
-Blockchain-based crop tracking
+### Smart Recommendation Engine
 
-Climate risk monitoring
+Example output:
+Recommended Action:
+Delay selling by 5 days for an expected 8% higher profit
 
-AI-based decision guidance
 
-Financial sell vs wait comparison
+---
 
-Multilingual accessibility
+### Multilingual Farmer Guidance Assistant
 
-QR-based supply chain transparency
+An AI assistant that helps farmers by answering questions about:
 
-This system helps farmers protect crops, make smarter decisions, and participate in a transparent marketplace.
+• crop selling decisions  
+• market trends  
+• climate risks  
+• farming best practices  
 
-⚙️ Key Features
-🌾 Blockchain Crop Tracking
+Supports multiple languages for better accessibility.
 
-Farmers create crop batches after harvest.
+---
 
-Each transaction is recorded on blockchain.
+## 🏗 Tech Stack
 
-Ownership transfers are permanently stored.
+**Frontend**
 
-Supply chain flow:
+React  
+Tailwind CSS  
+Axios  
+Chart.js / Recharts  
 
-Farmer → Retailer → Buyer
+**Backend**
 
-🌦 Climate Risk Monitoring
+FastAPI  
+Python  
 
-The system monitors environmental conditions using weather data:
+**Machine Learning**
 
-Rain probability
+Scikit-learn  
+Pandas  
+NumPy  
 
-Temperature
-
-Humidity
-
-Risk levels are displayed as:
-
-🟢 Low
-🟡 Moderate
-🔴 High
-
-Farmers receive alerts when climate risks may damage crops.
-
-🤖 AI Guidance Assistant
-
-The assistant provides real-time advice such as:
-
-Whether to sell crops immediately
-
-Storage recommendations
-
-Market suggestions
-
-Risk explanations
-
-💰 Sell vs Wait Financial Comparison
-
-FarmVista helps farmers compare profits.
-
-Example:
-
-Sell Today
-₹20 × 1000 kg = ₹20,000
-
-Wait 3 Days
-₹24 × 1000 kg = ₹24,000
-
-Potential Gain: ₹4,000
-
-This enables data-driven decisions.
-
-🌍 Multilingual Support
-
-To improve rural accessibility, the platform supports:
-
-English
-
-Tamil
-
-Users can switch languages directly from the dashboard.
-
-🔎 QR-Based Crop Tracking
-
-Each crop batch has a QR code.
-
-When scanned, it shows:
-
-Harvest date
-
-Ownership history
-
-Price journey
-
-Blockchain verification
-
-🏗 System Architecture
-Frontend (React + Tailwind)
-        │
-        │ API Requests
-        ▼
-Backend (FastAPI)
-        │
- ┌──────┼─────────┐
- │      │         │
- ▼      ▼         ▼
-Blockchain   Neo4j DB   Weather API
-(Polygon)
-🧑‍💻 Tech Stack
-Frontend
-
-React.js
-
-Tailwind CSS
-
-React Router
-
-Axios
-
-Ethers.js
-
-react-i18next
-
-Backend
-
-FastAPI
-
-Python
-
-Uvicorn
-
-Blockchain
-
-Solidity
-
-Polygon Network
-
-MetaMask
-
-Databases
-
-Neo4j (graph relationships)
+**Database**
 
 PostgreSQL
 
-External APIs
+---
 
-OpenWeatherMap API
+## ⚙ System Architecture
 
-📂 Project Structure
-farmvista-climate-agri-platform
-│
-├── frontend
-│   ├── src
-│   ├── public
-│   └── package.json
-│
-├── backend
-│   ├── app
-│   │   ├── routes
-│   │   ├── services
-│   │   ├── models
-│   │   └── main.py
-│   └── requirements.txt
-│
-├── blockchain
-│   ├── contracts
-│   │   └── CropTracking.sol
-│   └── scripts
-│
-└── README.md
+React Frontend
+↓
+FastAPI Backend
+↓
+PostgreSQL Database
+↓
+ML Prediction Model
+↓
+Risk Scoring Engine
+
+
+---
+
+## 📊 Features
+
+• Price trend prediction  
+• Risk scoring system  
+• Decision recommendation engine  
+• Dashboard visualization  
+• AI farmer guidance assistant  
+• Multilingual support  
+
+---
+
+## 🎯 Hackathon Domain
+
+**Precision Agriculture & Farm Automation Systems**
+
+Focus: **Decision-Support Software**
+
+---
+
+## 👨‍💻 Team
+
+Team Members:
+
+• Frontend Developer (React)  
+• Backend Developer (FastAPI + PostgreSQL)  
+• ML Engineer (Prediction + Risk Engine)
+
+---
+
+## 📌 Future Scope
+
+• Real-time mandi price integration  
+• IoT sensor data integration  
+• Advanced AI forecasting models  
+• Mobile app for farmers
+
+---
+
+## 💡 Vision
+
+Empowering farmers with **data-driven intelligence** so they can make confident, profitable decisions.
+
+---
