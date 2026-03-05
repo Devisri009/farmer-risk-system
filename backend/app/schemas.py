@@ -1,29 +1,38 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class UserBase(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str
     role: str
-    location: Optional[str] = None
+    name: str
+    username: str
+    phone: str
+    government_id_type: str
+    government_id_number: str
+    state: str
+    district: str
+    taluk: str
+    village: str
 
 class UserCreate(UserBase):
     password: str
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    username: str
     password: str
 
 class UserResponse(UserBase):
     id: int
+    created_at: datetime
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
     class Config:
         from_attributes = True
 
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    role: str
     user: UserResponse
 
 class ClimateAlert(BaseModel):
@@ -39,3 +48,41 @@ class WeatherForecast(BaseModel):
     day: str
     temp: str
     condition: str
+
+class CropBase(BaseModel):
+    cropName: str
+    quantity: str
+    pricePerKg: float
+    cultivateDate: str
+    harvestDate: str
+    location: str
+    description: Optional[str] = None
+
+class CropCreate(CropBase):
+    pass
+
+class CropResponse(CropBase):
+    id: int
+    farmer_id: int
+    status: str
+    risk_level: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class DashboardSummary(BaseModel):
+    activeCrops: int
+    revenue: str
+    alerts: int
+
+class ClimateData(BaseModel):
+    temp: int
+    rainProb: int
+    humidity: int
+    windSpeed: int
+
+class PricePrediction(BaseModel):
+    sellToday: int
+    wait3Days: int
+    potentialGain: int

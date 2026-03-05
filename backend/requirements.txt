@@ -7,3 +7,4 @@ python-jose[cryptography]
 python-multipart
 cors
 email-validator
+psycopg2-binary
