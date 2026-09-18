@@ -8,6 +8,7 @@ const PaymentBreakdown = () => {
     const [loading, setLoading] = useState(true);
     const [paymentDone, setPaymentDone] = useState(false);
     const [details, setDetails] = useState(null);
+    const [pageError, setPageError] = useState(null);
 
     useEffect(() => {
         const fetchPaymentEstimate = async () => {
@@ -19,19 +20,7 @@ const PaymentBreakdown = () => {
                 });
             } catch (error) {
                 console.error("Failed to fetch payment estimate:", error);
-                // Fallback simulation
-                setDetails({
-                    id: id,
-                    cropName: "Organic Tomatoes",
-                    quantity: "500 kg",
-                    farmerStr: "Green Valley Farm",
-                    breakdown: {
-                        baseCost: 7750.00,
-                        transportEstimate: 120.00,
-                        platformFee: 77.50,
-                        total: 7947.50
-                    }
-                });
+                setPageError(error.response?.data?.detail || "Crop details not found. It may have been sold or removed.");
             } finally {
                 setLoading(false);
             }
@@ -40,16 +29,45 @@ const PaymentBreakdown = () => {
         fetchPaymentEstimate();
     }, [id]);
 
-    const handleConfirmPayment = () => {
-        // Call smart contract transferOwnership()
-        setPaymentDone(true);
-        alert("Smart contract ownership transfer initiated on Polygon!");
+    const handleConfirmPayment = async () => {
+        if (!details) return;
+        
+        try {
+            // Call our new backend /api/purchase endpoint
+            await apiClient.post('/api/purchase', {
+                crop_id: details.id,
+                total_amount: details.breakdown.total,
+                base_cost: details.breakdown.baseCost,
+                transport_estimate: details.breakdown.transportEstimate,
+                platform_fee: details.breakdown.platformFee
+            });
+            
+            setPaymentDone(true);
+        } catch (error) {
+            console.error("Payment confirmation failed:", error);
+            alert("Failed to confirm purchase. Please try again.");
+        }
     };
 
     if (loading) {
         return (
             <div className="flex h-64 items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-green"></div>
+            </div>
+        );
+    }
+
+    if (pageError) {
+        return (
+            <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12 text-center mt-10">
+                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="text-red-500 text-3xl font-bold">!</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Cannot Proceed</h2>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">{pageError}</p>
+                <Link to="/retailer/marketplace" className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition inline-block">
+                    Return to Marketplace
+                </Link>
             </div>
         );
     }
@@ -62,7 +80,7 @@ const PaymentBreakdown = () => {
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Payment Successful!</h2>
                 <p className="text-gray-500 mb-8 max-w-md mx-auto">Smart contract ownership has been updated. You can view the blockchain receipt in your purchases.</p>
-                <Link to="/retailer/purchases" className="bg-primary-green text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors inline-block">
+                <Link to="/retailer/purchases" className="bg-primary-green text-white px-8 py-3.5 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-900/20 inline-block">
                     View My Purchases
                 </Link>
             </div>
@@ -115,7 +133,7 @@ const PaymentBreakdown = () => {
 
                     <button
                         onClick={handleConfirmPayment}
-                        className="w-full bg-primary-green text-white py-4 rounded-xl font-bold hover:bg-green-700 transition-colors mt-6 shadow-sm flex items-center justify-center gap-2"
+                        className="w-full bg-primary-green text-white py-4 rounded-xl font-bold hover:bg-green-700 transition-all mt-6 shadow-xl shadow-green-900/20 hover:shadow-green-900/30 hover:-translate-y-0.5 flex items-center justify-center gap-2"
                     >
                         Confirm & Transfer Ownership
                     </button>

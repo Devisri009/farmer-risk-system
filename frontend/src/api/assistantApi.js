@@ -1,3 +1,3 @@
-import apiClient from './client';
+import client from './client';
 
-export const sendMessageToAssistant = (message) => apiClient.post('/assistant', { message });
+export const sendAssistantMessage = (data) => client.post('/assistant', data);

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../../api/client';
 import registerIllustration from '../../assets/register-illustration.png';
-import LanguageToggle from '../../components/layout/LanguageToggle';
-/* ── Reusable input renderer defined OUTSIDE to prevent focus loss ── */
+
+/* ── Reusable input renderer ── */
 const InputField = ({ label, name, type = 'text', placeholder, value, onChange, error, required = true }) => (
     <div>
         <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -34,9 +34,44 @@ const InputField = ({ label, name, type = 'text', placeholder, value, onChange, 
     </div>
 );
 
+const SelectField = ({ label, name, options, value, onChange, error, required = true, placeholder = "Select option" }) => (
+    <div>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1.5">
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <select
+            id={name}
+            name={name}
+            value={value}
+            onChange={onChange}
+            className={`w-full px-4 py-2.5 rounded-xl border transition-all duration-200 outline-none text-sm appearance-none bg-white
+                ${error
+                    ? 'border-red-400 focus:ring-2 focus:ring-red-200 focus:border-red-400'
+                    : 'border-gray-200 focus:ring-2 focus:ring-green-200 focus:border-green-500'
+                }`}
+        >
+            <option value="">{placeholder}</option>
+            {options.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+            ))}
+        </select>
+        {error && (
+            <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {error}
+            </p>
+        )}
+    </div>
+);
+
 const Register = () => {
-    const navigate = useNavigate();
     const { t } = useTranslation();
+    const navigate = useNavigate();
+
+
+
     const [role, setRole] = useState('farmer');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [apiError, setApiError] = useState('');
@@ -44,11 +79,16 @@ const Register = () => {
 
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
+        username: '',
         phone: '',
         password: '',
         confirmPassword: '',
-        location: '',
+        government_id_type: '',
+        government_id_number: '',
+        state: '',
+        district: '',
+        taluk: '',
+        village: '',
     });
 
     const [errors, setErrors] = useState({});
@@ -56,7 +96,7 @@ const Register = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-        // Clear field error on change
+
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: '' }));
         }
@@ -66,33 +106,53 @@ const Register = () => {
     const validate = () => {
         const newErrors = {};
 
-        if (!formData.name.trim()) newErrors.name = 'Full name is required';
-
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Enter a valid email address';
-        }
-
+        if (!formData.name.trim()) newErrors.name = t('register.nameRequired', 'Full name is required');
+        if (!formData.username.trim()) newErrors.username = t('register.usernameRequired', 'Username is required');
         if (!formData.phone.trim()) {
-            newErrors.phone = 'Phone number is required';
+            newErrors.phone = t('register.phoneRequired', 'Phone number is required');
         } else if (!/^\d{10}$/.test(formData.phone.replace(/\s/g, ''))) {
-            newErrors.phone = 'Enter a valid 10-digit phone number';
+            newErrors.phone = t('register.phoneInvalid', 'Enter a valid 10-digit phone number');
         }
 
         if (!formData.password) {
-            newErrors.password = 'Password is required';
+            newErrors.password = t('register.passwordRequired', 'Password is required');
         } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+            newErrors.password = t('register.passwordMin', 'Password must be at least 6 characters');
         }
 
         if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Please confirm your password';
+            newErrors.confirmPassword = t('register.confirmRequired', 'Please confirm your password');
         } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
+            newErrors.confirmPassword = t('register.passMismatch', 'Passwords do not match');
         }
 
-        if (!formData.location.trim()) newErrors.location = 'Location is required';
+        if (!formData.government_id_type) {
+            newErrors.government_id_type = t('register.idTypeRequired', 'ID type is required');
+        }
+
+        if (!formData.government_id_number.trim()) {
+            newErrors.government_id_number = t('register.idNumRequired', 'ID number is required');
+        } else {
+            const idNumber = formData.government_id_number.trim();
+            if (formData.government_id_type === 'Aadhaar Number') {
+                if (!/^\d{12}$/.test(idNumber)) {
+                    newErrors.government_id_number = t('register.aadhaarDigits', 'Aadhaar must be 12 digits');
+                }
+            } else if (formData.government_id_type === 'PAN Number') {
+                if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(idNumber)) {
+                    newErrors.government_id_number = t('register.panFormat', 'PAN must be format ABCDE1234F');
+                }
+            } else if (formData.government_id_type === 'Voter ID') {
+                if (!/^[A-Z]{3}[0-9]{7}$/.test(idNumber)) {
+                    newErrors.government_id_number = t('register.voterFormat', 'Voter ID must be format ABC1234567');
+                }
+            }
+        }
+
+        if (!formData.state) newErrors.state = t('register.stateRequired', 'State is required');
+        if (!formData.district) newErrors.district = t('register.districtRequired', 'District is required');
+        if (!formData.taluk) newErrors.taluk = t('register.talukRequired', 'Taluk is required');
+        if (!formData.village) newErrors.village = t('register.villageRequired', 'Village is required');
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -109,82 +169,75 @@ const Register = () => {
 
         try {
             const payload = {
+                role,
                 name: formData.name.trim(),
-                email: formData.email.trim().toLowerCase(),
+                username: formData.username.trim().toLowerCase(),
                 phone: formData.phone.replace(/\s/g, ''),
                 password: formData.password,
-                role,
-                location: formData.location.trim(),
+                government_id_type: formData.government_id_type,
+                government_id_number: formData.government_id_number.trim(),
+                state: formData.state,
+                district: formData.district,
+                taluk: formData.taluk,
+                village: formData.village
             };
 
-            await apiClient.post('/auth/register', payload);
+            const response = await apiClient.post('/auth/register', payload);
+            const { access_token, user } = response.data;
 
-            setSuccessMsg('Account created successfully! Redirecting to login...');
+            // Log the user in immediately
+            localStorage.setItem('token', access_token);
+            localStorage.setItem('user', JSON.stringify(user));
+
+            setSuccessMsg(t('register.successMsg', 'Account created successfully! Welcome to FarmVista.'));
+
             setTimeout(() => {
-                navigate('/login');
-            }, 1500);
-        } catch (err) {
-            console.error('Registration Error:', err);
-
-            let message = 'Registration failed. Please try again.';
-
-            if (err.response?.data?.detail) {
-                const detail = err.response.data.detail;
-                if (typeof detail === 'string') {
-                    message = detail;
-                } else if (Array.isArray(detail)) {
-                    // Handle validation errors from FastAPI (array of objects)
-                    message = detail.map(d => d.msg).join(', ');
+                if (user.role === 'farmer') {
+                    navigate('/farmer/dashboard');
+                } else {
+                    navigate('/consumer/dashboard');
                 }
-            } else if (err.response?.data?.message) {
-                message = err.response.data.message;
-            } else if (err.response?.data?.error) {
-                message = err.response.data.error;
-            } else if (err.message) {
-                message = err.message;
-            }
-
-            setApiError(message);
+            }, 1000);
+        } catch (err) {
+            const message = dir => (dir.response?.data?.detail || dir.response?.data?.message || t('register.failMsg', 'Registration failed.'));
+            setApiError(err.response?.data?.detail || err.response?.data?.message || t('register.failMsg', 'Registration failed.'));
         } finally {
             setIsSubmitting(false);
         }
     };
 
+
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row relative">
-            <div className="absolute top-4 right-6 z-10">
-                <LanguageToggle />
-            </div>
+        <div className="min-h-screen flex flex-col lg:flex-row">
             {/* ════════════ LEFT — Platform Introduction ════════════ */}
             <div className="lg:w-[48%] w-full flex flex-col justify-center items-center px-8 py-12 lg:py-0"
                 style={{ background: 'linear-gradient(160deg, #f0fdf4 0%, #dcfce7 50%, #f0fdf4 100%)' }}>
 
                 <div className="max-w-md w-full space-y-6">
-                    {/* Badge */}
                     <span className="inline-block text-xs font-bold tracking-[0.2em] text-green-700 bg-green-100 px-3 py-1 rounded-full uppercase">
                         FarmVista
                     </span>
 
-                    {/* Heading */}
                     <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 leading-tight">
-                        {t('hero.title1')} <br /> {t('hero.title2')}
+                        {t('register.heading', 'Smart Digital')}<br />{t('register.subheading', 'Agriculture Platform')}
                     </h1>
 
-                    {/* Description */}
                     <p className="text-gray-600 text-sm lg:text-base leading-relaxed">
-                        {t('hero.description')}
+                        {t('register.description', 'FarmVista helps farmers and retailers connect through a climate-aware agricultural marketplace. Monitor climate risks, track crop batches, and trade crops with full transparency.')}
                     </p>
 
-                    {/* Feature pills */}
                     <div className="flex flex-wrap gap-2 pt-1">
-                        {['Climate Monitoring', 'Crop Tracking', 'Secure Trading'].map((f) => (
-                            <span key={f} className="text-xs font-medium text-green-800 bg-white/70 border border-green-200 px-3 py-1 rounded-full backdrop-blur-sm">
-                                {f}
+                        {[
+                            { id: '1', label: t('register.feat1', 'Climate Monitoring') },
+                            { id: '2', label: t('register.feat2', 'Crop Tracking') },
+                            { id: '3', label: t('register.feat3', 'Secure Trading') }
+                        ].map((f) => (
+                            <span key={f.id} className="text-xs font-medium text-green-800 bg-white/70 border border-green-200 px-3 py-1 rounded-full backdrop-blur-sm">
+                                {f.label}
                             </span>
                         ))}
                     </div>
 
-                    {/* Illustration */}
                     <div className="pt-4">
                         <img
                             src={registerIllustration}
@@ -196,17 +249,15 @@ const Register = () => {
             </div>
 
             {/* ════════════ RIGHT — Register Form ════════════ */}
-            <div className="lg:w-[52%] w-full flex items-center justify-center bg-gray-50 px-6 py-12 lg:py-0">
+            <div className="lg:w-[52%] w-full flex items-center justify-center bg-gray-50 px-6 py-12">
                 <div className="w-full max-w-md">
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 lg:p-10">
-                        {/* Form header */}
-                        <div className="mb-7 mt-4">
-                            <h2 className="text-2xl font-bold text-gray-900">{t('register.title')}</h2>
-                            <p className="text-gray-500 text-sm mt-1">{t('register.subtitle')}</p>
-                            <p className="text-gray-400 text-xs mt-2">{t('register.required')}</p>
+                        <div className="mb-7">
+                            <h2 className="text-2xl font-bold text-gray-900">{t('register.createAccountTitle', 'Create Account')}</h2>
+                            <p className="text-gray-500 text-sm mt-1">{t('register.createAccountSub', 'Register to start using FarmVista.')}</p>
+                            <p className="text-gray-400 text-xs mt-2">{t('register.requiredFields', 'Fields marked with * are required.')}</p>
                         </div>
 
-                        {/* API-level messages */}
                         {apiError && (
                             <div className="mb-5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
                                 <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -225,13 +276,12 @@ const Register = () => {
                         )}
 
                         <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                            {/* ── Role selector ── */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('register.role')} <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('register.selectRole', 'Select Role')} <span className="text-red-500">*</span></label>
                                 <div className="grid grid-cols-2 gap-3">
                                     {[
-                                        { value: 'farmer', label: t('register.roleFarmer'), icon: '🌾' },
-                                        { value: 'retailer', label: t('register.roleRetailer'), icon: '🛒' },
+                                        { value: 'farmer', label: t('register.farmer', 'Farmer'), icon: '🌾' },
+                                        { value: 'consumer', label: t('register.consumer', 'Consumer'), icon: '🛒' },
                                     ].map((r) => (
                                         <button
                                             key={r.value}
@@ -250,65 +300,124 @@ const Register = () => {
                                 </div>
                             </div>
 
-                            {/* ── Input fields ── */}
                             <InputField
-                                label={t('register.name')}
+                                label={t('register.fullName', 'Full Name')}
                                 name="name"
-                                placeholder="e.g. Logesh Kumar"
+                                placeholder={t('register.fullNamePlaceholder', 'e.g. Ramesh Kumar')}
                                 value={formData.name}
                                 onChange={handleChange}
                                 error={errors.name}
                             />
+
                             <InputField
-                                label={t('register.email')}
-                                name="email"
-                                type="email"
-                                placeholder="logesh@example.com"
-                                value={formData.email}
+                                label={t('register.username', 'Username')}
+                                name="username"
+                                placeholder={t('register.usernamePl', 'e.g. ramesh_farmer')}
+                                value={formData.username}
                                 onChange={handleChange}
-                                error={errors.email}
+                                error={errors.username}
                             />
+
                             <InputField
-                                label={t('register.phone')}
+                                label={t('register.phone', 'Phone Number')}
                                 name="phone"
                                 type="tel"
-                                placeholder="9876543210"
+                                placeholder={t('register.phonePl', '9876543210')}
                                 value={formData.phone}
                                 onChange={handleChange}
                                 error={errors.phone}
                             />
+
                             <InputField
-                                label={t('register.password')}
+                                label={t('register.password', 'Password')}
                                 name="password"
                                 type="password"
-                                placeholder="Min. 6 characters"
+                                placeholder={t('register.passwordPl', 'Min. 6 characters')}
                                 value={formData.password}
                                 onChange={handleChange}
                                 error={errors.password}
                             />
+
                             <InputField
-                                label={t('register.confirmPassword')}
+                                label={t('register.confirmPassword', 'Confirm Password')}
                                 name="confirmPassword"
                                 type="password"
-                                placeholder="Re-enter password"
+                                placeholder={t('register.confirmPasswordPl', 'Re-enter password')}
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 error={errors.confirmPassword}
                             />
-                            <InputField
-                                label={t('register.location')}
-                                name="location"
-                                placeholder="e.g. Tamil Nadu"
-                                value={formData.location}
-                                onChange={handleChange}
-                                error={errors.location}
-                            />
 
-                            {/* ── Submit button ── */}
+                            <div className="pt-2 border-t border-gray-100">
+                                <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('register.govDetailsTitle', 'Government ID Details')}</h3>
+                                <div className="space-y-4">
+                                    <SelectField
+                                        label={t('register.govIdType', 'Government ID Type')}
+                                        name="government_id_type"
+                                        options={["Aadhaar Number", "PAN Number", "Voter ID"]}
+                                        value={formData.government_id_type}
+                                        onChange={handleChange}
+                                        error={errors.government_id_type}
+                                        placeholder={t('register.govIdTypePl', 'Select ID Type')}
+                                    />
+                                    <InputField
+                                        label={t('register.idNumber', 'ID Number')}
+                                        name="government_id_number"
+                                        placeholder={
+                                            formData.government_id_type === 'Aadhaar Number' ? t('register.aadhaarPl', "Enter Aadhaar Number (12 digits)") :
+                                                formData.government_id_type === 'PAN Number' ? t('register.panPl', "Enter PAN Number (ABCDE1234F)") :
+                                                    formData.government_id_type === 'Voter ID' ? t('register.voterPl', "Enter Voter ID (ABC1234567)") :
+                                                        t('register.idNumberPl', 'Enter ID number')
+                                        }
+                                        value={formData.government_id_number}
+                                        onChange={handleChange}
+                                        error={errors.government_id_number}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-gray-100">
+                                <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('register.locDetailsTitle', 'Location Details')}</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <InputField
+                                        label={t('register.state', 'State')}
+                                        name="state"
+                                        placeholder={t('register.statePl', 'e.g. Tamil Nadu')}
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        error={errors.state}
+                                    />
+                                    <InputField
+                                        label={t('register.district', 'District')}
+                                        name="district"
+                                        placeholder={t('register.districtPl', 'e.g. Madurai')}
+                                        value={formData.district}
+                                        onChange={handleChange}
+                                        error={errors.district}
+                                    />
+                                    <InputField
+                                        label={t('register.taluk', 'Taluk')}
+                                        name="taluk"
+                                        placeholder={t('register.talukPl', 'e.g. Melur')}
+                                        value={formData.taluk}
+                                        onChange={handleChange}
+                                        error={errors.taluk}
+                                    />
+                                    <InputField
+                                        label={t('register.village', 'Village')}
+                                        name="village"
+                                        placeholder={t('register.villagePl', 'e.g. Kottampatti')}
+                                        value={formData.village}
+                                        onChange={handleChange}
+                                        error={errors.village}
+                                    />
+                                </div>
+                            </div>
+
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className={`w-full py-3 rounded-xl font-semibold text-white text-sm transition-all duration-200 mt-2
+                                className={`w-full py-3 rounded-xl font-semibold text-white text-sm transition-all duration-200 mt-4
                                     ${isSubmitting
                                         ? 'bg-green-400 cursor-not-allowed'
                                         : 'bg-green-600 hover:bg-green-700 active:scale-[0.98] shadow-sm hover:shadow'
@@ -320,19 +429,18 @@ const Register = () => {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                         </svg>
-                                        {t('register.creatingAccount')}
+                                        {t('register.creatingAccount', 'Creating Account...')}
                                     </span>
                                 ) : (
-                                    t('register.createAccount')
+                                    t('register.createAccount', 'Create Account')
                                 )}
                             </button>
                         </form>
 
-                        {/* ── Login redirect ── */}
                         <p className="text-center text-sm text-gray-500 mt-6">
-                            {t('register.hasAccount')}{' '}
+                            {t('register.alreadyAccount', 'Already have an account?')} {' '}
                             <Link to="/login" className="text-green-600 font-semibold hover:text-green-700 hover:underline transition-colors">
-                                {t('register.loginLink')}
+                                {t('register.loginHere', 'Login')}
                             </Link>
                         </p>
                     </div>

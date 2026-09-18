@@ -1,38 +1,33 @@
 import React from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 const CropTimeline = ({ events }) => {
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-gray-800">Blockchain Tracking</h3>
-                <span className="text-xs font-extrabold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 flex items-center gap-1.5 shadow-sm">
-                    <CheckCircle2 size={14} />
-                    Verified On-Chain
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 w-full">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-gray-800">Crop Timeline</h3>
+                <span className="flex items-center space-x-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full border border-green-200">
+                    <CheckCircle size={14} />
+                    <span>Blockchain Verified</span>
                 </span>
             </div>
 
-            <div className="relative space-y-8">
-                {/* Vertical Line */}
-                <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-100"></div>
-
-                {events.map((event, index) => (
-                    <div key={index} className="relative flex gap-6 pl-8">
-                        {/* Dot */}
-                        <div className="absolute left-0 top-1.5 w-6.5 h-6.5 bg-white border-2 border-green-500 rounded-full flex items-center justify-center -translate-x-1.5 z-10">
-                            <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
-                        </div>
-
-                        <div className="flex-1">
-                            <h4 className="font-bold text-gray-900 leading-none">{event.title}</h4>
-                            <div className="mt-2 text-sm text-gray-600 space-y-1">
+            <div className="relative pl-6 border-l-2 border-gray-200 space-y-8 mt-4">
+                {events?.map((event, index) => (
+                    <div key={index} className="relative">
+                        <div className={`absolute -left-[35px] mt-1.5 w-4 h-4 rounded-full border-4 border-white ${event.completed ? 'bg-green-500' : 'bg-gray-300'
+                            }`} />
+                        <div>
+                            <h4 className={`text-md font-bold ${event.completed ? 'text-gray-900' : 'text-gray-500'}`}>
+                                {event.title}
+                            </h4>
+                            <div className="mt-1 space-y-1">
                                 {event.details && Object.entries(event.details).map(([key, value]) => (
-                                    <p key={key}><span className="font-bold text-gray-500 lowercase">{key}:</span> {value}</p>
+                                    <p key={key} className="text-sm text-gray-600">
+                                        <span className="font-semibold text-gray-500 mr-2">{key}:</span> {value}
+                                    </p>
                                 ))}
                             </div>
-                        </div>
-                        <div className="text-right">
-                            <span className="text-xs font-bold text-gray-400 uppercase tracking-tighter">{event.date}</span>
                         </div>
                     </div>
                 ))}

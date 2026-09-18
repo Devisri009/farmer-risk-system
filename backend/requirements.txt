@@ -7,3 +7,10 @@ python-jose[cryptography]
 python-multipart
 cors
 email-validator
+psycopg2-binary
+google-generativeai
+google-genai
+python-dotenv
+web3
+requests
+httpx

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import LanguageToggle from '../../components/layout/LanguageToggle';
 import {
     CloudRain, ShieldCheck, Bot, TrendingUp, Languages, Users,
     PlusSquare, BarChart3, ShoppingCart, Link2,
@@ -17,32 +16,32 @@ const scrollTo = (id) => {
 
 /* ───────────────────── data ───────────────────────── */
 const features = [
-    { icon: <CloudRain size={28} />, title: 'Climate Risk Monitoring', desc: 'Monitor rainfall, temperature, and humidity risks affecting crops.' },
-    { icon: <ShieldCheck size={28} />, title: 'Blockchain Crop Tracking', desc: 'Track crop ownership and price history transparently.' },
-    { icon: <Bot size={28} />, title: 'AI Farmer Assistant', desc: 'Receive intelligent recommendations about selling crops.' },
-    { icon: <TrendingUp size={28} />, title: 'Sell vs Wait Prediction', desc: 'Compare profit potential before deciding when to sell.' },
-    { icon: <Languages size={28} />, title: 'Multilingual Support', desc: 'Accessible to farmers using local languages such as Tamil.' },
-    { icon: <Users size={28} />, title: 'Farmer Community Feed', desc: 'Farmers can share updates and interact with other farmers.' },
+    { icon: <CloudRain size={28} />, titleKey: 'feat1Title', descKey: 'feat1Desc' },
+    { icon: <ShieldCheck size={28} />, titleKey: 'feat2Title', descKey: 'feat2Desc' },
+    { icon: <Bot size={28} />, titleKey: 'feat3Title', descKey: 'feat3Desc' },
+    { icon: <TrendingUp size={28} />, titleKey: 'feat4Title', descKey: 'feat4Desc' },
+    { icon: <Languages size={28} />, titleKey: 'feat5Title', descKey: 'feat5Desc' },
+    { icon: <Users size={28} />, titleKey: 'feat6Title', descKey: 'feat6Desc' },
 ];
 
 const steps = [
-    { icon: <PlusSquare size={30} />, num: '01', text: 'Farmer posts crop batch.' },
-    { icon: <BarChart3 size={30} />, num: '02', text: 'Platform monitors climate risk.' },
-    { icon: <ShoppingCart size={30} />, num: '03', text: 'Retailers discover crops in marketplace.' },
-    { icon: <Link2 size={30} />, num: '04', text: 'Blockchain records ownership.' },
+    { icon: <PlusSquare size={30} />, num: '01', textKey: 'step1' },
+    { icon: <BarChart3 size={30} />, num: '02', textKey: 'step2' },
+    { icon: <ShoppingCart size={30} />, num: '03', textKey: 'step3' },
+    { icon: <Link2 size={30} />, num: '04', textKey: 'step4' },
 ];
 
 const reviews = [
-    { name: 'Ravi Kumar', role: 'Farmer', text: '"FarmVista helped me understand climate risks and choose the best time to sell crops."' },
-    { name: 'Priya Menon', role: 'Retailer', text: '"I can now buy crops directly from farmers with transparent pricing."' },
-    { name: 'Manoj Reddy', role: 'Farmer', text: '"The AI assistant gives helpful recommendations during harvest."' },
+    { name: 'Ravi Kumar', roleKey: 'roleFarmer', textKey: 'review1Text' },
+    { name: 'Priya Menon', roleKey: 'roleRetailer', textKey: 'review2Text' },
+    { name: 'Manoj Reddy', roleKey: 'roleFarmer', textKey: 'review3Text' },
 ];
 
 const faqs = [
-    { q: 'What is FarmVista?', a: 'FarmVista is a climate-aware agricultural supply chain platform that connects farmers and retailers through a transparent digital marketplace, helping farmers protect crops from climate risks and make smarter selling decisions.' },
-    { q: 'How does blockchain help farmers?', a: 'Blockchain provides an immutable, transparent record of crop ownership, pricing history, and transactions. This ensures trust between farmers and retailers and prevents disputes.' },
-    { q: 'How can retailers buy crops?', a: 'Retailers can browse the marketplace, view verified crop listings with climate risk data, and initiate purchases directly through the platform with blockchain-backed ownership transfer.' },
-    { q: 'Does the platform support local languages?', a: 'Yes! FarmVista currently supports English and Tamil, with plans to add more regional languages to make the platform accessible to rural farmers.' },
+    { qKey: 'faq1Q', aKey: 'faq1A' },
+    { qKey: 'faq2Q', aKey: 'faq2A' },
+    { qKey: 'faq3Q', aKey: 'faq3A' },
+    { qKey: 'faq4Q', aKey: 'faq4A' },
 ];
 
 /* ──────────────── useInView hook ──────────────────── */
@@ -78,16 +77,21 @@ const Reveal = ({ children, className = '', delay = 0 }) => {
 
 /* ═══════════════════ NAVBAR ═══════════════════════ */
 const Navbar = () => {
+    const { t, i18n } = useTranslation();
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const { t } = useTranslation();
+
+    const changeLanguage = (lang) => {
+        i18n.changeLanguage(lang);
+        localStorage.setItem("language", lang);
+    };
 
     const navLinks = [
-        { label: t('nav.home'), id: 'home' },
-        { label: t('nav.features'), id: 'features' },
-        { label: t('nav.howItWorks'), id: 'howitworks' },
-        { label: 'Reviews', id: 'reviews' },
-        { label: t('nav.faq'), id: 'faq' },
+        { label: t('nav.home', 'Home'), id: 'home' },
+        { label: t('nav.features', 'Features'), id: 'features' },
+        { label: t('nav.howItWorks', 'How It Works'), id: 'howitworks' },
+        { label: t('nav.reviews', 'Reviews'), id: 'reviews' },
+        { label: t('nav.faq', 'FAQ'), id: 'faq' },
     ];
 
     useEffect(() => {
@@ -100,18 +104,18 @@ const Navbar = () => {
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 h-16">
                 {/* Logo */}
-                <button className="flex items-center gap-2 group shrink-0" onClick={() => scrollTo('home')}>
+                <button className="flex items-center gap-2 group" onClick={() => scrollTo('home')}>
                     <Sprout className="text-[#2E7D32] transition-transform duration-300 group-hover:rotate-12" size={28} />
-                    <span className="text-xl font-extrabold text-[#2E7D32] hidden sm:block">FarmVista</span>
+                    <span className="text-xl font-extrabold text-[#2E7D32]">FarmVista</span>
                 </button>
 
                 {/* Desktop nav */}
-                <div className="hidden md:flex items-center gap-1 mx-4">
+                <div className="hidden md:flex items-center gap-1">
                     {navLinks.map(l => (
                         <button
                             key={l.id}
                             onClick={() => scrollTo(l.id)}
-                            className="relative px-3 py-2 text-sm font-medium text-gray-600 hover:text-[#2E7D32] transition-colors duration-200 group whitespace-nowrap"
+                            className="relative px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#2E7D32] transition-colors duration-200 group"
                         >
                             {l.label}
                             <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#2E7D32] rounded-full transition-all duration-300 group-hover:w-3/4" />
@@ -119,29 +123,33 @@ const Navbar = () => {
                     ))}
                 </div>
 
-                {/* Right Actions */}
-                <div className="hidden md:flex items-center gap-3 shrink-0">
-                    <LanguageToggle />
+                {/* Left side actions (Language & Auth) */}
+                <div className="hidden md:flex items-center gap-3">
+                    {/* Language Toggle */}
+                    <div className="flex items-center gap-2 mr-4 px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 font-bold text-gray-700 text-sm">
+                        <span>🌐</span>
+                        <button onClick={() => changeLanguage('en')} className={`hover:text-[#2E7D32] transition-colors ${i18n.language === 'en' ? 'text-[#2E7D32]' : ''}`}>EN</button>
+                        <span className="text-gray-300">|</span>
+                        <button onClick={() => changeLanguage('ta')} className={`hover:text-[#2E7D32] transition-colors ${i18n.language === 'ta' ? 'text-[#2E7D32]' : ''}`}>தமிழ்</button>
+                    </div>
+
                     <Link to="/login"
                         className="px-5 py-2 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold text-sm hover:bg-[#2E7D32] hover:text-white transition-all duration-300">
-                        {t('nav.login')}
+                        {t('nav.login', 'Login')}
                     </Link>
                     <Link to="/register"
                         className="px-5 py-2 rounded-full bg-[#2E7D32] text-white font-bold text-sm hover:bg-green-800 hover:shadow-lg hover:shadow-green-200 transition-all duration-300">
-                        {t('nav.register')}
+                        {t('nav.register', 'Register')}
                     </Link>
                 </div>
 
                 {/* Mobile toggle */}
-                <div className="md:hidden flex items-center gap-3">
-                    <LanguageToggle />
-                    <button className="p-2 text-gray-600 hover:text-[#2E7D32] transition-colors" onClick={() => setOpen(!open)}>
-                        <div className="relative w-6 h-6">
-                            <Menu size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'}`} />
-                            <X size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}`} />
-                        </div>
-                    </button>
-                </div>
+                <button className="md:hidden p-2 text-gray-600 hover:text-[#2E7D32] transition-colors" onClick={() => setOpen(!open)}>
+                    <div className="relative w-6 h-6">
+                        <Menu size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'}`} />
+                        <X size={24} className={`absolute inset-0 transition-all duration-300 ${open ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'}`} />
+                    </div>
+                </button>
             </div>
 
             {/* Mobile menu */}
@@ -153,9 +161,18 @@ const Navbar = () => {
                             {l.label}
                         </button>
                     ))}
+
+                    {/* Mobile Language Toggle */}
+                    <div className="flex items-center justify-center gap-2 mt-4 mb-2 py-2 rounded-full border border-gray-200 bg-gray-50 font-bold text-gray-700 text-sm w-full max-w-[200px] mx-auto">
+                        <span>🌐</span>
+                        <button onClick={() => changeLanguage('en')} className={`hover:text-[#2E7D32] transition-colors ${i18n.language === 'en' ? 'text-[#2E7D32]' : ''}`}>EN</button>
+                        <span className="text-gray-300">|</span>
+                        <button onClick={() => changeLanguage('ta')} className={`hover:text-[#2E7D32] transition-colors ${i18n.language === 'ta' ? 'text-[#2E7D32]' : ''}`}>தமிழ்</button>
+                    </div>
+
                     <div className="flex gap-3 mt-4">
-                        <Link to="/login" className="flex-1 text-center px-4 py-2.5 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold text-sm hover:bg-[#2E7D32] hover:text-white transition-all duration-300">{t('nav.login')}</Link>
-                        <Link to="/register" className="flex-1 text-center px-4 py-2.5 rounded-full bg-[#2E7D32] text-white font-bold text-sm hover:bg-green-800 transition-colors">{t('nav.register')}</Link>
+                        <Link to="/login" className="flex-1 text-center px-4 py-2.5 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold text-sm hover:bg-[#2E7D32] hover:text-white transition-all duration-300">{t('nav.login', 'Login')}</Link>
+                        <Link to="/register" className="flex-1 text-center px-4 py-2.5 rounded-full bg-[#2E7D32] text-white font-bold text-sm hover:bg-green-800 transition-colors">{t('nav.register', 'Register')}</Link>
                     </div>
                 </div>
             </div>
@@ -164,7 +181,8 @@ const Navbar = () => {
 };
 
 /* ═══════════════ FEATURE CARD ═════════════════════ */
-const FeatureCard = ({ icon, title, desc, delay }) => {
+const FeatureCard = ({ icon, titleKey, descKey, delay }) => {
+    const { t } = useTranslation();
     const [ref, isInView] = useInView();
     return (
         <div
@@ -178,14 +196,15 @@ const FeatureCard = ({ icon, title, desc, delay }) => {
             <div className="w-14 h-14 rounded-xl bg-green-50 text-[#2E7D32] flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#2E7D32] group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-100">
                 {icon}
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2 transition-colors duration-200 group-hover:text-[#2E7D32]">{title}</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2 transition-colors duration-200 group-hover:text-[#2E7D32]">{t(`landing.${titleKey}`)}</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">{t(`landing.${descKey}`)}</p>
         </div>
     );
 };
 
 /* ═══════════════════ STEP CARD ════════════════════ */
-const StepCard = ({ icon, num, text, delay }) => {
+const StepCard = ({ icon, num, textKey, delay }) => {
+    const { t } = useTranslation();
     const [ref, isInView] = useInView();
     return (
         <div
@@ -198,13 +217,14 @@ const StepCard = ({ icon, num, text, delay }) => {
                 {icon}
             </div>
             <span className="text-2xl font-extrabold text-[#A5D6A7] mb-2">{num}</span>
-            <p className="text-gray-600 text-sm leading-relaxed max-w-[220px]">{text}</p>
+            <p className="text-gray-600 text-sm leading-relaxed max-w-[220px]">{t(`landing.${textKey}`)}</p>
         </div>
     );
 };
 
 /* ══════════════ REVIEW CARD ═══════════════════════ */
-const ReviewCard = ({ name, role, text, delay }) => {
+const ReviewCard = ({ name, roleKey, textKey, delay }) => {
+    const { t } = useTranslation();
     const [ref, isInView] = useInView();
     return (
         <div
@@ -220,14 +240,14 @@ const ReviewCard = ({ name, role, text, delay }) => {
                     <Star key={j} size={16} fill="currentColor" className="transition-transform duration-200 group-hover:scale-110" style={{ transitionDelay: `${j * 50}ms` }} />
                 ))}
             </div>
-            <p className="text-gray-700 leading-relaxed mb-6 italic">{text}</p>
+            <p className="text-gray-700 leading-relaxed mb-6 italic">{t(`landing.${textKey}`)}</p>
             <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-full bg-green-100 text-[#2E7D32] font-bold flex items-center justify-center text-lg transition-all duration-300 group-hover:bg-[#2E7D32] group-hover:text-white group-hover:scale-105">
                     {name.charAt(0)}
                 </div>
                 <div>
                     <div className="font-bold text-gray-900 text-sm">{name}</div>
-                    <div className="text-xs text-[#2E7D32] font-semibold">{role}</div>
+                    <div className="text-xs text-[#2E7D32] font-semibold">{t(`landing.${roleKey}`)}</div>
                 </div>
             </div>
         </div>
@@ -235,7 +255,8 @@ const ReviewCard = ({ name, role, text, delay }) => {
 };
 
 /* ══════════════ FAQ ACCORDION ═════════════════════ */
-const FAQItem = ({ q, a, delay }) => {
+const FAQItem = ({ qKey, aKey, delay }) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const contentRef = useRef(null);
     const [ref, isInView] = useInView();
@@ -252,7 +273,7 @@ const FAQItem = ({ q, a, delay }) => {
                 onClick={() => setOpen(!open)}
                 className="w-full flex items-center justify-between px-6 py-5 text-left font-bold text-gray-800 hover:bg-gray-50 transition-colors duration-200"
             >
-                <span>{q}</span>
+                <span>{t(`landing.${qKey}`)}</span>
                 <ChevronDown
                     size={20}
                     className={`shrink-0 transition-all duration-300 ${open ? 'rotate-180 text-[#2E7D32]' : 'text-gray-400'}`}
@@ -264,7 +285,7 @@ const FAQItem = ({ q, a, delay }) => {
                 style={{ maxHeight: open ? contentRef.current?.scrollHeight + 'px' : '0px' }}
             >
                 <div className="px-6 pb-5 text-gray-600 leading-relaxed">
-                    {a}
+                    {t(`landing.${aKey}`)}
                 </div>
             </div>
         </div>
@@ -274,6 +295,23 @@ const FAQItem = ({ q, a, delay }) => {
 /* ══════════════════ LANDING PAGE ══════════════════ */
 const Landing = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [chainStats, setChainStats] = useState(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/chain/stats');
+                if (res.ok) {
+                    const data = await res.json();
+                    setChainStats(data);
+                }
+            } catch (err) {
+                // Fallback gracefully without breaking
+            }
+        };
+        fetchStats();
+    }, []);
 
     return (
         <div className="bg-white text-gray-800 overflow-x-hidden scroll-smooth">
@@ -287,23 +325,29 @@ const Landing = () => {
 
                 <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col-reverse md:flex-row items-center gap-12 relative z-10">
                     <Reveal className="md:w-1/2 space-y-6">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-[#2E7D32] text-xs font-bold tracking-wide uppercase animate-pulse">
-                            🌱 {t('hero.badge')}
-                        </span>
-                        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900">
-                            Farm<span className="text-[#2E7D32]">Vista</span> – {t('hero.title1')} <br className="hidden md:block" /> {t('hero.title2')}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-block px-4 py-1.5 rounded-full bg-green-100 text-[#2E7D32] text-xs font-bold tracking-wide uppercase">
+                                🌱 {t('hero.subtitle', 'Climate-Aware Agriculture')}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
+                                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                {chainStats ? `${chainStats.total_batches_on_chain || 0} Batches Verified on Polygon` : 'Polygon Amoy Verified'}
+                            </span>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-gray-900">
+                            Farm<span className="text-[#2E7D32]">Vista</span> – {t('hero.title', 'Climate-Aware Agricultural Supply Chain Platform')}
                         </h1>
                         <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
-                            {t('hero.description')}
+                            {t('hero.description', 'Connecting farmers and retailers through a transparent digital marketplace while helping farmers manage climate risks.')}
                         </p>
                         <div className="flex flex-wrap gap-4 pt-2">
                             <Link to="/register"
                                 className="group px-7 py-3.5 rounded-full bg-[#2E7D32] text-white font-bold hover:bg-green-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-green-200 flex items-center gap-2">
-                                {t('hero.getStarted')} <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+                                {t('hero.getStarted', 'Get Started')} <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
                             </Link>
-                            <Link to="/retailer/marketplace"
+                            <Link to="/consumer/marketplace"
                                 className="px-7 py-3.5 rounded-full border-2 border-[#2E7D32] text-[#2E7D32] font-bold hover:bg-[#2E7D32] hover:text-white transition-all duration-300">
-                                {t('hero.viewMarket')}
+                                {t('hero.explore', 'Explore Marketplace')}
                             </Link>
                         </div>
                     </Reveal>
@@ -322,8 +366,8 @@ const Landing = () => {
             <section id="features" className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
                     <Reveal>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">Platform Features</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto mb-14">Smart tools helping farmers and retailers trade crops efficiently.</p>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">{t('landing.featuresTitle')}</h2>
+                        <p className="text-gray-500 max-w-xl mx-auto mb-14">{t('landing.featuresDesc')}</p>
                     </Reveal>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -338,7 +382,7 @@ const Landing = () => {
             <section id="howitworks" className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
                     <Reveal>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-14">How FarmVista Works</h2>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-14">{t('landing.howItWorksTitle')}</h2>
                     </Reveal>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 relative">
@@ -356,7 +400,7 @@ const Landing = () => {
             <section id="reviews" className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
                     <Reveal>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-14">What Our Users Say</h2>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-14">{t('landing.reviewsTitle')}</h2>
                     </Reveal>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -371,10 +415,10 @@ const Landing = () => {
             <section id="faq" className="py-20 bg-gray-50">
                 <div className="max-w-3xl mx-auto px-4 md:px-8">
                     <Reveal>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 text-center mb-12">Frequently Asked Questions</h2>
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 text-center mb-12">{t('landing.faqTitle')}</h2>
                     </Reveal>
                     <div className="space-y-4">
-                        {faqs.map((f, i) => <FAQItem key={i} q={f.q} a={f.a} delay={i * 100} />)}
+                        {faqs.map((f, i) => <FAQItem key={i} qKey={f.qKey} aKey={f.aKey} delay={i * 100} />)}
                     </div>
                 </div>
             </section>
@@ -387,16 +431,21 @@ const Landing = () => {
                             <Sprout className="text-[#A5D6A7]" size={24} />
                             <span className="text-lg font-extrabold text-white">FarmVista</span>
                         </div>
-                        <p className="text-sm leading-relaxed">Climate-aware agricultural supply chain platform connecting farmers and retailers.</p>
+                        <p className="text-sm leading-relaxed">{t('landing.footerDesc')}</p>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Quick Links</h4>
+                        <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">{t('landing.quickLinks')}</h4>
                         <ul className="space-y-2 text-sm">
-                            {['home', 'features', 'howitworks', 'faq'].map(id => (
-                                <li key={id}>
-                                    <button onClick={() => scrollTo(id)} className="hover:text-white transition-colors duration-200 capitalize">
-                                        {id === 'howitworks' ? 'How It Works' : id}
+                            {[
+                                { id: 'home', label: t('nav.home', 'Home') },
+                                { id: 'features', label: t('nav.features', 'Features') },
+                                { id: 'howitworks', label: t('nav.howItWorks', 'How It Works') },
+                                { id: 'faq', label: t('nav.faq', 'FAQ') }
+                            ].map(link => (
+                                <li key={link.id}>
+                                    <button onClick={() => scrollTo(link.id)} className="hover:text-white transition-colors duration-200">
+                                        {link.label}
                                     </button>
                                 </li>
                             ))}
@@ -404,24 +453,24 @@ const Landing = () => {
                     </div>
 
                     <div>
-                        <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Contact</h4>
+                        <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">{t('landing.contact')}</h4>
                         <ul className="space-y-3 text-sm">
                             <li className="flex items-center gap-2"><Mail size={16} /> support@farmvista.io</li>
-                            <li className="flex items-center gap-2"><LifeBuoy size={16} /> Help Center</li>
+                            <li className="flex items-center gap-2"><LifeBuoy size={16} /> {t('landing.helpCenter')}</li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Platform</h4>
+                        <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">{t('landing.platform')}</h4>
                         <ul className="space-y-2 text-sm">
-                            <li><Link to="/login" className="hover:text-white transition-colors duration-200">Login</Link></li>
-                            <li><Link to="/register" className="hover:text-white transition-colors duration-200">Register</Link></li>
+                            <li><Link to="/login" className="hover:text-white transition-colors duration-200">{t('nav.login', 'Login')}</Link></li>
+                            <li><Link to="/register" className="hover:text-white transition-colors duration-200">{t('nav.register', 'Register')}</Link></li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 md:px-8 mt-12 pt-8 border-t border-gray-800 text-center text-xs text-gray-500">
-                    © 2026 FarmVista – Climate-Aware Agricultural Supply Chain Platform
+                    {t('landing.rights')}
                 </div>
             </footer>
         </div>

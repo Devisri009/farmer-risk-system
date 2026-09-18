@@ -1,21 +1,3 @@
-<<<<<<< HEAD
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
 FarmVista – Climate-Aware Agricultural Supply Chain Platform
 
 FarmVista is a climate-aware, blockchain-enabled agricultural supply chain platform designed to empower farmers with transparency, climate insights, and intelligent decision support.
@@ -157,18 +139,7 @@ Price journey
 
 Blockchain verification
 
-🏗 System Architecture
-Frontend (React + Tailwind)
-        │
-        │ API Requests
-        ▼
-Backend (FastAPI)
-        │
- ┌──────┼─────────┐
- │      │         │
- ▼      ▼         ▼
-Blockchain   Neo4j DB   Weather API
-(Polygon)
+
 🧑‍💻 Tech Stack
 Frontend
 
@@ -210,26 +181,3 @@ External APIs
 
 OpenWeatherMap API
 
-📂 Project Structure
-farmvista-climate-agri-platform
-│
-├── frontend
-│   ├── src
-│   ├── public
-│   └── package.json
-│
-├── backend
-│   ├── app
-│   │   ├── routes
-│   │   ├── services
-│   │   ├── models
-│   │   └── main.py
-│   └── requirements.txt
-│
-├── blockchain
-│   ├── contracts
-│   │   └── CropTracking.sol
-│   └── scripts
-│
-└── README.md
->>>>>>> 8fda394e3ba5af7a39086384662f4a410559ae6b

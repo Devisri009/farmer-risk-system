@@ -1,22 +1,24 @@
-import axios from 'axios';
+import axios from "axios";
 
-const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-    headers: {
-        'Content-Type': 'application/json',
-    },
+const apiHost = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+    ? window.location.hostname
+    : 'localhost';
+
+const client = axios.create({
+    baseURL: `http://${apiHost}:5000/api`
 });
 
-// Automatically attach token to every request
-apiClient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+client.interceptors.request.use(config => {
+    const token = localStorage.getItem("token");
+    const lang = localStorage.getItem("language") || "en";
 
-export default apiClient;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    config.headers['Accept-Language'] = lang;
+
+    return config;
+});
+
+export default client;

@@ -1,6 +1,9 @@
-import apiClient from './client';
+import client from './client';
 
-export const getDashboardSummary = () => apiClient.get('/dashboard/summary');
-export const getClimateData = () => apiClient.get('/climate');
-export const getPricePrediction = () => apiClient.get('/price-prediction');
-export const getClimateRisk = () => apiClient.get('/climate/risk');
+export const getDashboardSummary = () => client.get('/dashboard/summary');
+export const getClimateData = () => client.get('/climate');
+export const getClimateRisk = () => client.get('/climate/risk');
+export const getPricePrediction = () => client.get('/price-prediction');
+export const getBatchesPerMonth = () => client.get('/dashboard/batches-per-month');
+export const getCropRecommendations = (soilType = null) =>
+    client.get('/crops/recommendations', { params: soilType ? { soil_type: soilType } : {} });
